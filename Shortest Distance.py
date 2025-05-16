@@ -1,6 +1,11 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import heapq
+import pandas as pd
+import numpy as np
+import random
+
+random.seed(42)
 
 
 def create_dict(existing_dict):
@@ -127,7 +132,7 @@ between_the_2_aisle_columns = 8
 inside_aisle=25
 
 #this is an example of the nodes that need to be visited for the completion of a given order.
-node_sequence = [0, 5, 11, 32, 56, 61]
+node_sequence = [0, 5, 5, 11, 32, 56, 61]
 
 snake_dictionary= snake_pattern(empty_dict, between_aisle,start_end,inside_aisle)
 modified_graph = add_shortcuts(snake_dictionary,between_aisle,between_the_2_aisle_columns)
@@ -177,8 +182,9 @@ def compute_sequence_path_distance(modified_graph, node_sequence):
     if 0 not in node_sequence or 61 not in node_sequence:
         raise ValueError("The node sequence must include start node 0 and end node 61.")
     
-    if (len(node_sequence) - 2) % 2 != 0:
-        raise ValueError(f"The number of intermediate nodes ({len(node_sequence) - 2}) must be divisible by 2.")
+    #Absolutely no idea why I had it in the first place
+    #if (len(node_sequence) - 2) % 2 != 0:
+    #    raise ValueError(f"The number of intermediate nodes ({len(node_sequence) - 2}) must be divisible by 2.")
 
     total_distance = 0
     full_path = []
@@ -216,11 +222,102 @@ def compute_sequence_path_distance(modified_graph, node_sequence):
         if not found:
             raise ValueError(f"No path found from {start} to {end}")
 
-    print(f"Total distance for visiting nodes {node_sequence} in order: {total_distance}")
+    #print(f"Total distance for visiting nodes {node_sequence} in order: {total_distance}")
     return total_distance, full_path
 
+"""
+this is a test try, to see if the function behaves correctly.
+If you have multiple items from the same node [0, 17, 17, 38, 41, 59, 59, 61] the function still works just fine
+"""
+#total_dist, visited_nodes = compute_sequence_path_distance(modified_graph, node_sequence)
+#plot_warehouse_from_matrix(modified_graph)
+#plot_warehouse_from_matrix(modified_graph, visited_nodes=visited_nodes, requested_nodes=node_sequence)
+
+#############################################################################################################################
+##################################################  Reading the CSV file created via "Generate_item_dataset" with pandas and doing some statistics
+##################################################  on the order travelled distance
+#############################################################################################################################
 
 
-total_dist, visited_nodes = compute_sequence_path_distance(modified_graph, node_sequence)
-plot_warehouse_from_matrix(modified_graph, visited_nodes=visited_nodes, requested_nodes=node_sequence)
-plot_warehouse_from_matrix(modified_graph)
+file_path = r"C:\Users\MSI\Desktop\downloaded files from uni\Year 4\Q3\System Analysis and Simulation\generated_orders_24h.csv"
+df = pd.read_csv(file_path)
+
+# Group by TimestampMin and aggregate AisleLocation into a list
+# Step 1: Group and sort AisleLocation
+grouped_df = df.groupby('TimestampMin')['AisleLocation'].apply(
+    lambda x: [0] + sorted(map(int, x)) + [61]
+).reset_index()
+
+# Calculate total distance and store visited path
+def calculate_distance_and_path(row):
+    node_sequence = row['AisleLocation']
+    total_dist, visited_nodes = compute_sequence_path_distance(modified_graph, node_sequence)
+    return pd.Series({'TotalDistance': total_dist, 'VisitedNodes': visited_nodes})
+
+# Step 3: Apply function to each row
+grouped_df[['TotalDistance', 'VisitedNodes']] = grouped_df.apply(calculate_distance_and_path, axis=1)
+
+# Calculate the number of nodes visited per order
+grouped_df['NumVisitedNodes'] = grouped_df['VisitedNodes'].apply(len)
+
+# Compute statistics
+mean_nodes = grouped_df['NumVisitedNodes'].mean()
+median_nodes = grouped_df['NumVisitedNodes'].median()
+std_nodes = grouped_df['NumVisitedNodes'].std()
+
+print(f"Mean number of nodes visited: {mean_nodes:.2f}")
+print(f"Median number of nodes visited: {median_nodes}")
+print(f"Standard deviation of nodes visited: {std_nodes:.2f}")
+
+print(grouped_df['TotalDistance'].describe())
+print(grouped_df['NumVisitedNodes'].describe())
+
+
+# Additional stats
+median_distance = grouped_df['TotalDistance'].median()
+print(f"Median: {median_distance:.2f}")
+
+
+'''
+#REMOVED, SINCE WE MIGHT NOT NEED IT, ESPECIALLY IN THE REPORT, BUT IT WAS INTERESTING TO SEE IT
+
+# Step 5: Select 3 orders (the shortest, longest and random)
+shortest_order = grouped_df.loc[grouped_df['TotalDistance'].idxmin()]
+longest_order = grouped_df.loc[grouped_df['TotalDistance'].idxmax()]
+random_order = grouped_df.sample(n=1).iloc[0]
+
+# Step 6: Visualize paths
+plot_warehouse_from_matrix(modified_graph, visited_nodes=shortest_order['VisitedNodes'], requested_nodes=shortest_order['AisleLocation'])
+plot_warehouse_from_matrix(modified_graph, visited_nodes=random_order['VisitedNodes'], requested_nodes=random_order['AisleLocation'])
+plot_warehouse_from_matrix(modified_graph, visited_nodes=longest_order['VisitedNodes'], requested_nodes=longest_order['AisleLocation'])
+'''
+
+# Extract data
+distances = grouped_df['TotalDistance']
+
+# Compute statistics
+mean_val = distances.mean()
+median_val = distances.median()
+
+# Plot histogram and capture bin data
+plt.figure(figsize=(10, 6))
+counts, bins, patches = plt.hist(distances, bins=20, color='skyblue', edgecolor='black', alpha=0.8)
+
+# Annotate each bar
+for count, bin_left, patch in zip(counts, bins[:-1], patches):
+    plt.text(bin_left + (bins[1] - bins[0]) / 2, count + 1,  # Add slight offset above bar
+             str(int(count)), ha='center', va='bottom', fontsize=9)
+
+# Add mean and median lines
+plt.axvline(mean_val, color='red', linestyle='dashed', linewidth=2, label=f'Mean: {mean_val:.2f}')
+plt.axvline(median_val, color='green', linestyle='dashed', linewidth=2, label=f'Median: {median_val:.2f}')
+
+# Labels and title
+plt.title('Histogram of Total Travel Distance per Order (with Counts)', fontsize=14)
+plt.xlabel('Total Distance', fontsize=12)
+plt.ylabel('Number of Orders', fontsize=12)
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.6)
+
+plt.tight_layout()
+plt.show()
