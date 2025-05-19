@@ -4,31 +4,37 @@ import heapq
 import pandas as pd
 import numpy as np
 import random
+import csv
+import os
+
 
 random.seed(42)
 
 
 def create_dict(existing_dict):
-    for key in range(61):
-        existing_dict[key] = None  # Or your desired default value
+    # Fix range to include all 62 nodes (0-61)
+    for key in range(62):  # Changed from 61 to 62
+        existing_dict[key] = None
     return existing_dict
 
-def snake_pattern(empty_dict,between_aisle=3, start_end=5, inside_aisle=25):
+def snake_pattern(empty_dict, between_aisle=3, start_end=5, inside_aisle=25):
     graph = {}
-    for key in range(61):  # Keys 0-62
+    # Process all 62 nodes (0-61)
+    for key in range(62):  # Changed from 61 to 62
         next_key = key + 1
-        if next_key > 61:
+        if next_key > 61:  # Properly handle last node
             graph[key] = {}
         elif key == 0 or key == 60:
             graph[key] = {next_key: start_end}
         else:
-            # Determine pattern position using (key-1) % 3
             match (key - 1) % 3:
                 case 0 | 1:
                     graph[key] = {next_key: inside_aisle}
                 case 2:
                     graph[key] = {next_key: between_aisle}
     return graph
+
+
 
 def add_shortcuts(graph, between_aisle=3, shortcut5_distance=5):
     """Adds shortcut connections to the graph with specified distances.
@@ -234,12 +240,80 @@ If you have multiple items from the same node [0, 17, 17, 38, 41, 59, 59, 61] th
 #plot_warehouse_from_matrix(modified_graph, visited_nodes=visited_nodes, requested_nodes=node_sequence)
 
 #############################################################################################################################
-##################################################  Reading the CSV file created via "Generate_item_dataset" with pandas and doing some statistics
+##################################################  Creating a CSV file with the shortest distances from "X" --> "Y"
+##################################################  
+#############################################################################################################################
+
+def compute_distances(graph, start_node):
+    """Computes shortest distances from specified start node to all other nodes."""
+    distances = {node: float('inf') for node in graph}
+    distances[start_node] = 0
+    visited = set()
+    heap = [(0, start_node)]
+    
+    while heap:
+        current_dist, current_node = heapq.heappop(heap)
+        if current_node in visited:
+            continue
+        visited.add(current_node)
+        
+        for neighbor, weight in graph.get(current_node, {}).items():
+            if neighbor not in distances:
+                continue  # Skip if neighbor not in graph
+            distance = current_dist + weight
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                heapq.heappush(heap, (distance, neighbor))
+    return distances
+
+def write_to_csv(all_distances, filename="distances.csv"):
+    """Writes all distances to a CSV file at the specified path."""
+    # Create directory if it doesn't exist
+    directory = os.path.dirname(filename)
+    if directory and not os.path.exists(directory):
+        os.makedirs(directory)
+    
+    # Write the file
+    nodes = sorted(all_distances.keys())
+    with open(filename, 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        header = ['From\To'] + [str(node) for node in nodes]
+        writer.writerow(header)
+        for src in nodes:
+            row = [str(src)]
+            for dst in nodes:
+                if dst > src:
+                    distance = all_distances[src].get(dst, '')
+                    row.append(str(distance) if distance != float('inf') else '')
+                else:
+                    row.append('')
+            writer.writerow(row)
+    
+    # Print confirmation
+    absolute_path = os.path.abspath(filename)
+    print(f"CSV file saved to: {absolute_path}")
+
+
+# Calculate all pairwise distances
+all_distances = {}
+for start_node in range(62):
+    all_distances[start_node] = compute_distances(modified_graph, start_node)
+
+# Write results to CSV
+write_to_csv(all_distances, filename=r"C:\Users\MSI\Desktop\downloaded files from uni\Year 4\Q3\System Analysis and Simulation\distance.csv")
+
+print("CSV file created successfully!")
+
+
+#############################################################################################################################
+##################################################  Reading the CSV file with pandas and doing some statistics
 ##################################################  on the order travelled distance
 #############################################################################################################################
 
 
+
 file_path = r"C:\Users\MSI\Desktop\downloaded files from uni\Year 4\Q3\System Analysis and Simulation\generated_orders_24h.csv"
+
 df = pd.read_csv(file_path)
 
 # Group by TimestampMin and aggregate AisleLocation into a list
@@ -278,6 +352,7 @@ median_distance = grouped_df['TotalDistance'].median()
 print(f"Median: {median_distance:.2f}")
 
 
+
 '''
 #REMOVED, SINCE WE MIGHT NOT NEED IT, ESPECIALLY IN THE REPORT, BUT IT WAS INTERESTING TO SEE IT
 
@@ -291,6 +366,8 @@ plot_warehouse_from_matrix(modified_graph, visited_nodes=shortest_order['Visited
 plot_warehouse_from_matrix(modified_graph, visited_nodes=random_order['VisitedNodes'], requested_nodes=random_order['AisleLocation'])
 plot_warehouse_from_matrix(modified_graph, visited_nodes=longest_order['VisitedNodes'], requested_nodes=longest_order['AisleLocation'])
 '''
+
+
 
 # Extract data
 distances = grouped_df['TotalDistance']
