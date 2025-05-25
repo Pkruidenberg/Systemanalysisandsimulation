@@ -1,6 +1,8 @@
 
 # ASRS + Container Innovation
-see the sample video `animation.mp4` (32x speed). 
+file to run: `animation4-10.py`
+
+for a sample video, see `animation.mp4` (32x speed). 
 sample logs of an 1 hour simulation can be found in `sample_log.txt` (most interesting stats at the bottom)
 
 files and dependences:
