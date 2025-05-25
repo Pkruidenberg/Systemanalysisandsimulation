@@ -1,6 +1,6 @@
 
 # ASRS + Container Innovation
-see the sample video `animation.mp4`. 
+see the sample video `animation.mp4` (32x speed). 
 sample logs of an 1 hour simulation can be found in `sample_log.txt` (most interesting stats at the bottom)
 
 files and dependences:
@@ -25,6 +25,8 @@ env.animation_parameters(animate=False)
 ```
 at around line 1455
 
+
+the AGV speed difference might not seem consistent cus the scaling of each elements are off. for example, with distances of 3 between ailes, 5 on cross-column shortcuts and 25 on the aisles, the actual elements might not be placed on the actual scale which can result in visually different speeds, however the AGV always moves at a fixed speed internally.
 
 ## elements
 nodes 1-60 are aisle nodes. the middle is the ASRS/container node and the left/right nodes are the entry/exit nodes depending on the snake pattern. paths strictly only follow incremental nodes, such as 1->2->3 and 4->5->6 resulting in the snake pattern (see fig 9).
