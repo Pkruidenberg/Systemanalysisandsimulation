@@ -1,0 +1,58 @@
+===== Enhanced Warehouse Simulation Statistics =====
+Innovation mode: OFF
+Simulation time: 1440.00 minutes (24.00 hours)
+Orders created: 411
+Orders completed: 409
+Average order completion time: 10.49 minutes
+Throughput: 17.04 orders/hour
+Minimum order time: 1.01 minutes
+Maximum order time: 28.18 minutes
+Total AGV distance traveled: 170187.00 meters
+Total AGV waiting time: 1998.60 minutes
+Total battery recharges: 94
+Average AGV battery level: 58.2%
+
+===== Innovation Performance Metrics =====
+Sequential transfers: 1821 (100.0%)
+Innovation mode OFF - all transfers use traditional sequential processing
+
+===== Individual AGV Statistics =====
+AGV 1:
+  - Total recharges: 19
+  - Final battery level: 73.2%
+  - Total distance traveled: 34548.00 meters
+  - Total waiting time: 433.90 minutes
+  - Current status: idle
+  - Current node: 0
+AGV 2:
+  - Total recharges: 19
+  - Final battery level: 67.5%
+  - Total distance traveled: 33502.00 meters
+  - Total waiting time: 396.97 minutes
+  - Current status: picking_up
+  - Current node: 8
+AGV 3:
+  - Total recharges: 19
+  - Final battery level: 67.7%
+  - Total distance traveled: 33888.00 meters
+  - Total waiting time: 389.54 minutes
+  - Current status: idle
+  - Current node: 0
+AGV 4:
+  - Total recharges: 19
+  - Final battery level: 50.4%
+  - Total distance traveled: 34479.00 meters
+  - Total waiting time: 403.43 minutes
+  - Current status: picking_up
+  - Current node: 14
+AGV 5:
+  - Total recharges: 18
+  - Final battery level: 32.1%
+  - Total distance traveled: 33770.00 meters
+  - Total waiting time: 374.76 minutes
+  - Current status: charging
+  - Current node: 62
+
+Node-based Navigation Summary:
+Total unique pickup nodes: 20
+Average distance per AGV: 34037.40 meters
