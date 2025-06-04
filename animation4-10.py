@@ -8,7 +8,11 @@ import pandas as pd
 # GLOBAL PARAMETERS - Main settings that control the entire simulation
 # ===============================================================================
 
-INNOVATION = True  # Switch between old method (False) and new container method (True)
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
+
+INNOVATION = False # Switch between old method (False) and new container method (True)
 AGV_SPEED = 2  # How fast AGVs move in meters per second
 MAX_CHARGE = 100  # Full battery is 100%
 CHARGE_THRESHOLD = 35  # AGVs need charging when battery drops below 30%
@@ -436,19 +440,19 @@ def generate_simulated_items():
 class OrderGenerator(sim.Component):
     """Creates new customer orders at random intervals"""
     def setup(self, items_pool):
-        self.inter_arrival_time = sim.Exponential(3.47 * 60)  # Time between orders
-        self.items_per_order = sim.Poisson(5)  # How many items per order
+        self.inter_arrival_time = lambda: np.random.exponential(3.47 * 60)  # Time between orders
+        self.items_per_order = lambda: np.random.poisson(5)  # How many items per order
         self.items_pool = items_pool  # All available items
 
     def process(self):
         """Main process that keeps creating new orders"""
         while True:
             # Wait for next order
-            iat = self.inter_arrival_time.sample()
+            iat = self.inter_arrival_time()
             self.hold(iat)
 
             # Decide how many items this order needs
-            num_items = max(1, int(self.items_per_order.sample()))
+            num_items = max(1, int(self.items_per_order()))
 
             # Pick random items for this order
             if len(self.items_pool) >= num_items:
@@ -1452,8 +1456,8 @@ class WarehouseStats:
 
 # Initialize simulation
 env = sim.Environment(trace=False)
-env.animation_parameters(animate=True, width=AnimationConfig.WINDOW_WIDTH, height=AnimationConfig.WINDOW_HEIGHT)
-# env.animation_parameters(animate=False)
+#env.animation_parameters(animate=True, width=AnimationConfig.WINDOW_WIDTH, height=AnimationConfig.WINDOW_HEIGHT)
+env.animation_parameters(animate=False)
 env.stats = WarehouseStats()
 
 # Load adjacency matrix and warehouse data
