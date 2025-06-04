@@ -8,11 +8,11 @@ import pandas as pd
 # GLOBAL PARAMETERS - Main settings that control the entire simulation
 # ===============================================================================
 
-SEED = 42
+SEED = 59
 random.seed(SEED)
 np.random.seed(SEED)
 
-INNOVATION = False # Switch between old method (False) and new container method (True)
+INNOVATION = True # Switch between old method (False) and new container method (True)
 AGV_SPEED = 2  # How fast AGVs move in meters per second
 MAX_CHARGE = 100  # Full battery is 100%
 CHARGE_THRESHOLD = 35  # AGVs need charging when battery drops below 30%
