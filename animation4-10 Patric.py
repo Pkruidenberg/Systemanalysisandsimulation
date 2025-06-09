@@ -8,17 +8,18 @@ import pandas as pd
 # GLOBAL PARAMETERS - Main settings that control the entire simulation
 # ===============================================================================
 
-INNOVATION = True  # Switch between old method (False) and new container method (True)
-AGV_SPEED = 2  # How fast AGVs move in meters per second
-MAX_CHARGE = 100  # Full battery is 100%
-CHARGE_THRESHOLD = 45  # AGVs need charging when battery drops below 45% (this is the worst case possible, with orders from all aisles)
-CHARGE_RATE = 4.5 / 60  # How fast batteries charge (4.5% per minute converted to per second)
-SIM_DURATION = 24 * 60 * 60  # How long simulation runs (24 hours in seconds)
-CSV_FILE = 'warehouse_items.csv'  # File containing all warehouse items
-ADJACENCY_CSV = 'adjacency.csv'  # File showing which nodes connect to which nodes
+INNOVATION = False                  # Switch between old method (False) and new container method (True)
+AGV_SPEED = 2                       # How fast AGVs move in meters per second
+MAX_CHARGE = 100                    # Full battery is 100%
+CHARGE_THRESHOLD = 45               # AGVs need charging when battery drops below 45%
+CHARGE_RATE = 4.5 / 60              # How fast batteries charge (4.5% per minute converted to per second)
+SIM_DURATION = 24 * 60 * 60         # How long simulation runs (24 hours in seconds)
+CSV_FILE = 'warehouse_items.csv'    # File containing all warehouse items
+ADJACENCY_CSV = 'adjacency.csv'     # File showing which nodes connect to which nodes
+AGV_NUMBR = 3                       # Set the number of AGVs
 SEED = 43
-random.seed(SEED)        # For salabim distributions and Python random
-np.random.seed(SEED)     # For numpy-based selections
+random.seed(SEED)                   # For salabim distributions and Python random
+np.random.seed(SEED)                # For numpy-based selections
 
 
 
@@ -1491,7 +1492,7 @@ for node in sorted(unique_nodes):
 SimLogger.log(f"Created {len(asrs_list)} ASRS systems for nodes: {sorted(unique_nodes)}")
 
 # Create AGVs
-num_agv=3
+num_agv=AGV_NUMBR
 for i in range(num_agv):
     agv = AGV(name=f"AGV_{i + 1}", agv_id=i + 1)
     agv_list.append(agv)
