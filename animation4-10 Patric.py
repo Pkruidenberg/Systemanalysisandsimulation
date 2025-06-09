@@ -11,7 +11,7 @@ import pandas as pd
 INNOVATION = True  # Switch between old method (False) and new container method (True)
 AGV_SPEED = 2  # How fast AGVs move in meters per second
 MAX_CHARGE = 100  # Full battery is 100%
-CHARGE_THRESHOLD = 35  # AGVs need charging when battery drops below 30%
+CHARGE_THRESHOLD = 45  # AGVs need charging when battery drops below 45% (this is the worst case possible, with orders from all aisles)
 CHARGE_RATE = 4.5 / 60  # How fast batteries charge (4.5% per minute converted to per second)
 SIM_DURATION = 24 * 60 * 60  # How long simulation runs (24 hours in seconds)
 CSV_FILE = 'warehouse_items.csv'  # File containing all warehouse items
