@@ -17,6 +17,8 @@ SIM_DURATION = 24 * 60 * 60         # How long simulation runs (24 hours in seco
 CSV_FILE = 'warehouse_items.csv'    # File containing all warehouse items
 ADJACENCY_CSV = 'adjacency.csv'     # File showing which nodes connect to which nodes
 AGV_NUMBR = 3                       # Set the number of AGVs
+arrival_time_seconds = 17.3        # 17.3 seconds between orders,  means 5000 orders for the day
+#arrival_time_seconds = 208.2        # 208.2 seconds between orders, means 415 orders per day
 SEED = 43
 random.seed(SEED)                   # For salabim distributions and Python random
 np.random.seed(SEED)                # For numpy-based selections
@@ -444,7 +446,7 @@ def generate_orders_ahead(seed, duration_seconds, items_pool):
     random.seed(seed)
     np.random.seed(seed)
 
-    inter_arrival_time_dist = sim.Exponential(3.47 * 60)
+    inter_arrival_time_dist = sim.Exponential(arrival_time_seconds)
     items_per_order_dist = sim.Poisson(5)
 
     time = 0
