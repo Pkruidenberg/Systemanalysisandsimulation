@@ -20,6 +20,9 @@ def generate_unique_seeds():
         seeds.add(seed)
     return list(seeds)
 
+lst_seeds = generate_unique_seeds()
+print(lst_seeds)
+
 seed_list = generate_unique_seeds()
 generic_results_list = []
 results_on_list = []
