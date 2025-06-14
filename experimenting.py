@@ -11,6 +11,7 @@ n = 100  # number of runs
 all_results = [n]
 
 # change these numbers according to scenarios
+# use 4 AGVs as with 5, both On and Off case manage to satisfy the demand, With 4 AGVs at least there is some difference.
 agv_number = 4
 charge_threshold = 90
 agv_speed = 2
